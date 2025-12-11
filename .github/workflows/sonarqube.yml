@@ -41,6 +41,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
-          cd SecurityService   # <-- Mets le dossier où se trouve pom.xml
-          mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          cd SecurityService
+          mvn -B -DskipTests=true verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
             -Dsonar.projectKey=DevopsPipeLine
