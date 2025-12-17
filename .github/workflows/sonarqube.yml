@@ -42,5 +42,5 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           cd SecurityService
-          mvn -B -DskipTests=true verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+          mvn -B -DskipTests=true  mvn -B clean verify sonar:sonar \
             -Dsonar.projectKey=DevopsPipeLine
