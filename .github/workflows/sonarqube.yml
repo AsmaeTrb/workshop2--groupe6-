@@ -42,7 +42,7 @@ jobs:
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
         run: |
           cd SecurityService
-          mvn -B clean verify sonar:sonar -DskipTests \
+          mvn -B -e clean verify sonar:sonar -DskipTests \
             -Dsonar.projectKey=DevopsPipeLine \
             -Dsonar.host.url=$SONAR_HOST_URL \
             -Dsonar.login=$SONAR_TOKEN
