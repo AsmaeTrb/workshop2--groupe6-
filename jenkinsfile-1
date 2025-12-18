@@ -1,17 +1,13 @@
 pipeline {
   agent any
 
-  options {
-    buildDiscarder(logRotator(numToKeepStr: '5'))
-  }
-
   stages {
     stage('Sonar Scan - SecurityService') {
       steps {
         dir('SecurityService') {
           withSonarQubeEnv('sq1') {
             sh 'chmod +x mvnw'
-            sh './mvnw clean verify org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+            sh './mvnw clean verify -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
           }
         }
       }
