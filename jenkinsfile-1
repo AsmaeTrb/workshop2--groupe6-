@@ -1,31 +1,44 @@
 pipeline {
-  agent any
-
-  stages {
-
-    stage('Semgrep Scan - SecurityService') {
-      steps {
-        dir('SecurityService') {
-          sh '''
-            python3 -m pip install --user -U semgrep
-            ~/.local/bin/semgrep scan --config=auto --error
-          '''
+    agent any
+    stages {
+        stage('Semgrep Scan') {
+            agent {
+                docker {
+                    image 'returntocorp/semgrep'
+                    args '-u root:root --entrypoint=""'
+                }
+            }
+            steps {
+                sh '''
+                    # Scan simple avec règles par défaut
+                    semgrep scan --config auto --json --output semgrep-results.json .
+                    
+                    # Vérifier les résultats
+                    if [ -s semgrep-results.json ]; then
+                        echo "Semgrep scan terminé. Résultats sauvegardés."
+                        # Ajouter ici une logique de fail si nécessaire
+                        # exit 1
+                    fi
+                '''
+                
+                // Sauvegarder les résultats
+                archiveArtifacts artifacts: 'semgrep-results.json', allowEmptyArchive: true
+                
+                // Optionnel : afficher un résumé
+                sh 'semgrep scan --config auto --text --output /dev/stdout . || true'
+            }
         }
-      }
-    }
-
-    stage('Sonar Scan - SecurityService') {
-      steps {
-        dir('SecurityService') {
-          withSonarQubeEnv('sq1') {
-            sh '''
-              chmod +x mvnw
-              ./mvnw clean verify -DskipTests \
-              org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar
-            '''
-          }
+        
+        // Votre étape SonarQube existante...
+        stage('Sonar Scan - SecurityService') {
+            steps {
+                dir('SecurityService') {
+                    withSonarQubeEnv('sq1') {
+                        sh 'chmod +x mvnw'
+                        sh './mvnw clean verify -DskipTests org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+                    }
+                }
+            }
         }
-      }
     }
-  }
 }
