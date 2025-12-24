@@ -9,17 +9,19 @@ pipeline {
       }
     }
 
-    stage('OWASP Dependency-Check (SecurityService)') {
+    stage('OWASP Dependency-Check') {
       steps {
         dir('SecurityService') {
-          bat '''
-            echo Lancement OWASP Dependency-Check
-            if exist mvnw.cmd (
-              call mvn dependency-check:check -DautoUpdate=false
-            ) else (
-              mvn dependency-check:check
-            )
-          '''
+          withCredentials([string(credentialsId: 'NVD_API_KEY', variable: 'NVD_KEY')]) {
+            bat '''
+              echo OWASP Dependency-Check (avec NVD API Key)
+              if exist mvnw.cmd (
+                call mvnw.cmd -B dependency-check:check -DnvdApiKey=%NVD_KEY%
+              ) else (
+                mvn -B dependency-check:check -DnvdApiKey=%NVD_KEY%
+              )
+            '''
+          }
         }
       }
       post {
