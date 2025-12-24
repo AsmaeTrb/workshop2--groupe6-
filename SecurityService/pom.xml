@@ -105,6 +105,8 @@
                         <format>JSON</format>
                     </formats>
                     <outputDirectory>${project.build.directory}/dependency-check-report</outputDirectory>
+                                 <ossIndexAnalyzerEnabled>false</ossIndexAnalyzerEnabled>
+
                 </configuration>
             </plugin>
 
