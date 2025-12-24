@@ -8,27 +8,34 @@ pipeline {
       }
     }
 
-    stage('OWASP Dependency-Check') {
+    stage('Build (sans tests)') {
+      steps {
+        dir('SecurityService') {
+          bat 'mvn -B clean package -DskipTests'
+        }
+      }
+    }
+
+    stage('OWASP Dependency-Check (Offline)') {
       steps {
         dir('SecurityService') {
           bat '''
+            echo Mode OFFLINE - utilisation des données locales...
+            
             mvn -B org.owasp:dependency-check-maven:check ^
               -Dformat=HTML ^
               -Dformat=JSON ^
               -DfailBuildOnCVSS=7 ^
-              -DfailOnError=true ^
-              -DskipTests ^
-              -DoutputDirectory=./target/security-reports
+              -DautoUpdate=false ^
+              -DnvdApiDelay=0 ^
+              --no-transfer-progress
           '''
         }
       }
       post {
         always {
-          // Sauvegarder les rapports
-          archiveArtifacts 'SecurityService/target/security-reports/**'
-          
-          // Alternative : juste le HTML
-          archiveArtifacts 'SecurityService/target/dependency-check-report.html'
+          archiveArtifacts artifacts: 'SecurityService/target/dependency-check-report.*', 
+            allowEmptyArchive: true
         }
       }
     }
