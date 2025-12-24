@@ -18,7 +18,6 @@ mvn org.owasp:dependency-check-maven:check ^
   -DnvdDatafeedUrl=file:///C:/dc-data/nvdcve-2.0-2024.json.gz ^
   -DnvdDatafeedUrl=file:///C:/dc-data/nvdcve-2.0-2025.json.gz ^
   -DsuppressionFile=suppression.xml ^
-  -DossIndexAnalyzerEnabled=false
 '''
     }
   }
