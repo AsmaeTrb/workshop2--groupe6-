@@ -10,15 +10,16 @@ pipeline {
     }
 
     stage('Dependency-Check') {
-    steps {
-        bat '''
-        mvn org.owasp:dependency-check-maven:check ^
-          -DnvdDatafeedUrl=file:///C:/dc-data/nvdcve-2.0-%d.json.gz ^
-          -DautoUpdate=false
-        '''
-    }
-}
-
+      steps {
+        // Si ton projet est dans le dossier SecurityService
+        dir('SecurityService') {
+          bat '''
+          mvn org.owasp:dependency-check-maven:check ^
+            -DnvdDatafeedUrl=file:///C:/dc-data/nvdcve-2.0-%d.json.gz ^
+            -DautoUpdate=false
+          '''
+        }
+      }
       post {
         always {
           archiveArtifacts artifacts: 'SecurityService/target/dependency-check-report.*', allowEmptyArchive: true
