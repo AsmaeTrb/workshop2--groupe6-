@@ -1,0 +1,32 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Checkout') {
+      steps {
+        checkout scm
+      }
+    }
+
+    stage('Build & Test (SecurityService)') {
+      steps {
+        dir('SecurityService') {
+          bat 'mvn -B clean test package'
+        }
+      }
+    }
+
+    stage('OWASP Dependency-Check (SecurityService)') {
+      steps {
+        dir('SecurityService') {
+          bat 'mvn -B org.owasp:dependency-check-maven:9.0.9:check -Dformat=HTML,JSON -DfailBuildOnCVSS=7'
+        }
+      }
+      post {
+        always {
+          archiveArtifacts artifacts: 'SecurityService\\target\\dependency-check-report\\**', allowEmptyArchive: true
+        }
+      }
+    }
+  }
+}
