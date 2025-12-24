@@ -15,7 +15,7 @@ pipeline {
           bat '''
             echo Lancement OWASP Dependency-Check
             if exist mvnw.cmd (
-              call mvnw.cmd dependency-check:check
+              call mvn dependency-check:check -DautoUpdate=false
             ) else (
               mvn dependency-check:check
             )
