@@ -3,35 +3,32 @@ pipeline {
 
   stages {
     stage('Checkout') {
-      steps { checkout scm }
-    }
-
-    stage('Build (sans tests)') {
-      steps {
-        dir('SecurityService') {
-          bat 'mvn -B clean package -DskipTests'
-        }
+      steps { 
+        checkout scm 
       }
     }
 
     stage('OWASP Dependency-Check') {
       steps {
-        // CHANGEMENT ICI : 'NVD_API_KEY' au lieu de 'nvd-api-key'
-        withCredentials([string(credentialsId: 'NVD_API_KEY', variable: 'NVD_API_KEY')]) {
-          dir('SecurityService') {
-            bat '''
-              mvn -B org.owasp:dependency-check-maven:9.0.9:check ^
-                -Dnvd.api.key=%NVD_API_KEY% ^
-                -DnvdApiDelay=6000 ^
-                -Dformat=HTML,JSON ^
-                -DfailBuildOnCVSS=7
-            '''
-          }
+        dir('SecurityService') {
+          bat '''
+            mvn -B org.owasp:dependency-check-maven:check ^
+              -Dformat=HTML ^
+              -Dformat=JSON ^
+              -DfailBuildOnCVSS=7 ^
+              -DfailOnError=true ^
+              -DskipTests ^
+              -DoutputDirectory=./target/security-reports
+          '''
         }
       }
       post {
         always {
-          archiveArtifacts artifacts: 'SecurityService/target/*.html, SecurityService/target/*.json', allowEmptyArchive: true
+          // Sauvegarder les rapports
+          archiveArtifacts 'SecurityService/target/security-reports/**'
+          
+          // Alternative : juste le HTML
+          archiveArtifacts 'SecurityService/target/dependency-check-report.html'
         }
       }
     }
