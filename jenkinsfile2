@@ -17,17 +17,17 @@ stage('Dependency-Check') {
         -DnvdDatafeedUrl=file:///C:/dc-data/nvdcve-2.0-2023.json.gz ^
         -DnvdDatafeedUrl=file:///C:/dc-data/nvdcve-2.0-2024.json.gz ^
         -DnvdDatafeedUrl=file:///C:/dc-data/nvdcve-2.0-2025.json.gz ^
-  -DfailBuildOnCVSS=11
-
+        -DfailBuildOnCVSS=11
       '''
     }
   }
   post {
     always {
-      archiveArtifacts artifacts: 'SecurityService/target/dependency-check-report.*', allowEmptyArchive: true
+      archiveArtifacts artifacts: 'SecurityService/target/dependency-check-report/**', allowEmptyArchive: true
     }
   }
 }
+
 
 
   }
