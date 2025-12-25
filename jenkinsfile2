@@ -9,22 +9,20 @@ pipeline {
       }
     }
 
-  stage('OWASP Dependency-Check') {
-  steps {
-    bat """
-    docker run --rm ^
-      -v "%CD%:/src" ^
-      owasp/dependency-check ^
-      --scan /src/SecurityService ^
-      --format HTML ^
-      --out /src/dependency-check-report
-    """
-  }
-}
-
+    stage('OWASP Dependency-Check') {
+      steps {
+        bat """
+        docker run --rm ^
+          -v "%CD%:/src" ^
+          owasp/dependency-check ^
+          --scan /src/SecurityService ^
+          --format HTML ^
+          --out /src/dependency-check-report
+        """
+      }
       post {
         always {
-          archiveArtifacts artifacts: 'SecurityService/target/dependency-check-report/**', allowEmptyArchive: true
+          archiveArtifacts artifacts: 'dependency-check-report/**', allowEmptyArchive: true
         }
       }
     }
