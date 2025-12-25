@@ -9,17 +9,19 @@ pipeline {
       }
     }
 
-    stage('Dependency-Check') {
-      steps {
-        dir('SecurityService') {
-          bat '''
-            mvn org.owasp:dependency-check-maven:check ^
-              -DautoUpdate=false ^
-              -DdataDirectory=C:\\dc-data ^
-              -DsuppressionFile=suppression.xml
-          '''
-        }
-      }
+  stage('OWASP Dependency-Check') {
+  steps {
+    bat """
+    docker run --rm ^
+      -v "%CD%:/src" ^
+      owasp/dependency-check ^
+      --scan /src/SecurityService ^
+      --format HTML ^
+      --out /src/dependency-check-report
+    """
+  }
+}
+
       post {
         always {
           archiveArtifacts artifacts: 'SecurityService/target/dependency-check-report/**', allowEmptyArchive: true
